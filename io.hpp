@@ -7,8 +7,6 @@ public:
   strv sep = " ";
 
   IO() {
-    reload();
-
     char *ptr = table[0];
     fr (a, 10)
       fr (b, 10)
@@ -26,8 +24,8 @@ public:
 
   char getchar() {
     if (iptr == eptr) {
-      if (eptr != R::end(ibuf)) return eof = true, EOF;
       reload();
+      if (iptr == eptr) return eof = true, EOF;
     }
     return *iptr++;
   }
@@ -89,7 +87,7 @@ public:
   void flush() { fwrite(obuf, 1, optr - obuf, out), optr = obuf; }
 
   void write(const char c) {
-    if (optr == R::end(obuf)) flush();
+    if (optr == obuf + BUF_SIZE) flush();
     *optr++ = c;
   }
 
@@ -98,7 +96,7 @@ public:
   }
 
   void write(integer auto x) {
-    if (R::end(obuf) - optr < TOS_SIZE) flush();
+    if (obuf + BUF_SIZE - optr < TOS_SIZE) flush();
 
     if constexpr (signed_integer<decltype(x)>)
       if (x < 0) *optr++ = '-', x = -x;
@@ -137,6 +135,7 @@ public:
 
   template <typename T1, typename T2>
   void write(const std::pair<T1, T2> p) { write(p.first), write(sep), write(p.second); }
+  void write(const std::tuple<>) {}
   template <typename... Args>
   void write(const std::tuple<Args...> t) {
     std::apply([&](auto &&x, auto &&...args) { write(x), ((write(sep), write(args)), ...); }, t);
@@ -170,10 +169,17 @@ private:
 } io;
 
 void read(auto &...args) { (io.read(FWD(args)), ...); }
+template <typename T = int>
+T read() {
+  T x;
+  read(x);
+  return x;
+}
+
 void nwrite(auto &&...args) { (io.write(FWD(args)), ...); }
 void nwriteln(auto &&...args) { nwrite(args..., '\n'); }
-void write(auto &&...args) { nwrite(std::forward_as_tuple(args...)); }
-void writeln(auto &&...args) { write(std::forward_as_tuple(args...), '\n'); }
+void write(auto &&...args) { nwrite(std::tuple(args...)); }
+void writeln(auto &&...args) { nwrite(std::tuple(args...), '\n'); }
 
 #define dread(T, ...) \
   T __VA_ARGS__;      \
@@ -182,9 +188,7 @@ void writeln(auto &&...args) { write(std::forward_as_tuple(args...), '\n'); }
   auto a = dvec<T>(__VA_ARGS__); \
   read(a)
 
-#define multi      \
-  dread(int, _tc); \
-  while (_tc--)
+#define multi for (int _tc = read(), testcase = 1; testcase <= _tc; testcase++)
 
 void yes(bool b = true) { nwriteln(b ? "yes" : "no"); }
 void no(bool b = true) { nwriteln(b ? "no" : "yes"); }
