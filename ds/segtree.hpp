@@ -36,7 +36,7 @@ public:
   }
 
   void apply(int u, const T x) {
-    u += sz, dat[u] = M::op(dat[u]);
+    u += sz, dat[u] = M::op(dat[u], x);
     while (u >>= 1) pushup(u);
   }
 

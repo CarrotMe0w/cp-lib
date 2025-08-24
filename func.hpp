@@ -118,7 +118,7 @@ constexpr bool chmin(auto &a, const auto &...args) {
 }
 
 template <typename T = void>
-constexpr auto sum(const R::forward_range auto &&v, auto &&...args) {
+constexpr auto sum(const R::input_range auto &v, auto &&...args) {
   if constexpr (std::is_void_v<T>) return std::reduce(all(v), R::range_value_t<decltype(v)>{}, args...);
   else return std::reduce(all(v), T{}, args...);
 }
