@@ -1,3 +1,5 @@
+#define PROBLEM "https://judge.yosupo.jp/problem/static_range_sum"
+
 #include "main.hpp"
 #include "misc/cumsum.hpp"
 

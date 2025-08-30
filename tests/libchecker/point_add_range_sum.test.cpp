@@ -1,3 +1,5 @@
+#define PROBLEM "https://judge.yosupo.jp/problem/point_add_range_sum"
+
 #include "main.hpp"
 #include "ds/segtree.hpp"
 #include "monoid/add.hpp"
